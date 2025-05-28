@@ -21,10 +21,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 
-data class shoppingItem(val id: Int, var name: String, var quantity: Int, var isediting: Boolean)
+
+data class shoppingItem(val id: Int, var name: String, var quantity: Int, var isediting: Boolean = false)
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,7 +49,9 @@ fun shoppingListApp() {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            items(stiems) {}
+            items(stiems) {
+
+            }
         }
     }
 
@@ -61,28 +63,51 @@ fun shoppingListApp() {
                     .padding(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                
+                Button(onClick = {
+                    if (itemname.isNotBlank()) {
+                        val newitem = shoppingItem(id=stiems.size +1  , name = itemname, quantity =  itemquant ?: 1)
+                        stiems = stiems + newitem
+                        showdialog = false
+                        itemname = ""
+
+                    }
+                }) {
+
+                    Text("add")
+                }
+                Button(onClick = { showdialog = false }) {
+                    Text("cancel")
+                }
             }
 
         }, title = { Text("Add shoppin items") }, text = {
-            OutlinedTextField(
-                value = itemname,
-                onValueChange = { itemname = it },
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            )
-            OutlinedTextField(
-                value = itemquant.toString(),
-                onValueChange = { itemquant = it.toInt() },
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            )
+            Column {
+                OutlinedTextField(
+                    value = itemname,
+                    onValueChange = { itemname = it },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
+                OutlinedTextField(
+                    value = itemquant.toString(),
+                    onValueChange = { itemquant = it.toInt() },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
+            }
+
 
 
         })
     }
+}
+
+@Composable
+
+fun shoppingListItems(item: shoppingItem, onEditClick: ()-> Unit, onDeleteClick:()->Unit ){
+
 }
