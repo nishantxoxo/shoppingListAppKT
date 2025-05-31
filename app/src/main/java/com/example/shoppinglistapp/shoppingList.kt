@@ -1,6 +1,7 @@
 package com.example.shoppinglistapp
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,11 +9,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,8 +34,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 
-
-data class shoppingItem(val id: Int, var name: String, var quantity: Int, var isediting: Boolean = false)
+data class shoppingItem(
+    val id: Int,
+    var name: String,
+    var quantity: Int,
+    var isediting: Boolean = false
+)
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,7 +65,7 @@ fun shoppingListApp() {
                 .padding(16.dp)
         ) {
             items(stiems) {
-
+                shoppingListItems(it, {}, {})
             }
         }
     }
@@ -68,7 +80,11 @@ fun shoppingListApp() {
             ) {
                 Button(onClick = {
                     if (itemname.isNotBlank()) {
-                        val newitem = shoppingItem(id=stiems.size +1  , name = itemname, quantity =  itemquant ?: 1)
+                        val newitem = shoppingItem(
+                            id = stiems.size + 1,
+                            name = itemname,
+                            quantity = itemquant ?: 1
+                        )
                         stiems = stiems + newitem
                         showdialog = false
                         itemname = ""
@@ -104,13 +120,75 @@ fun shoppingListApp() {
             }
 
 
-
         })
     }
 }
 
 @Composable
+fun shoppingItemEditor(item: shoppingItem, onEditComp: (String, Int) -> Unit) {
+    var editedName by remember { mutableStateOf(item.name) }
+    var editedQuant by remember { mutableStateOf(item.quantity.toString()) }
+    var isediting by remember { mutableStateOf(item.isediting) }
 
-fun shoppingListItems(item: shoppingItem, onEditClick: ()-> Unit, onDeleteClick:()->Unit ){
-    Row (modifier = Modifier.padding(8.dp).fillMaxWidth().border(border = BorderStroke(2.dp, Color.Cyan))){  }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Gray)
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Column() {
+            BasicTextField(
+                value = editedName,
+                onValueChange = { editedName = it },
+                singleLine = true,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(8.dp)
+            )
+            BasicTextField(
+                value = editedQuant,
+                onValueChange = { editedQuant = it },
+                singleLine = true,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(8.dp)
+            )
+        }
+        Button(onClick = {
+            isediting = false;
+            onEditComp(editedName, editedQuant.toIntOrNull()?: 1 , )
+        }) { Text("save") }
+
+    }
+
+
+}
+
+
+@Composable
+fun shoppingListItems(item: shoppingItem, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .border(border = BorderStroke(2.dp, Color.Cyan))
+    ) {
+        Text(text = item.name, modifier = Modifier.padding(8.dp))
+        Text(text = "QTY: ${item.quantity}", modifier = Modifier.padding(8.dp))
+        Row(modifier = Modifier.padding(8.dp)) {
+            IconButton(onClick = onEditClick) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = ""
+                )
+            }
+            IconButton(onClick = onDeleteClick) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = ""
+                )
+            }
+        }
+    }
 }
