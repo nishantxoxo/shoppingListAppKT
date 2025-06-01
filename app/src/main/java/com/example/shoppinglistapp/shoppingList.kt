@@ -65,7 +65,27 @@ fun shoppingListApp() {
                 .padding(16.dp)
         ) {
             items(stiems) {
-                shoppingListItems(it, {}, {})
+                item -> if(item.isediting){
+                    shoppingItemEditor(item= item, onEditComp = {
+                        editedName, editedQuant ->
+                        stiems = stiems.map{ it.copy(isediting =  false)}
+                        val editeditem = stiems.find { it.id == item.id }
+                        editeditem?.let { it.name = editedName
+                        it.quantity  = editedQuant
+                        }
+
+                    })
+            }
+                else{
+                shoppingListItems(item, {
+                    stiems = stiems.map{ it.copy(isediting = it.id == item.id) }
+                }, {
+                    stiems = stiems - item
+
+
+                })
+            }
+
             }
         }
     }
@@ -172,7 +192,9 @@ fun shoppingListItems(item: shoppingItem, onEditClick: () -> Unit, onDeleteClick
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .border(border = BorderStroke(2.dp, Color.Cyan))
+            .border(border = BorderStroke(2.dp, Color.Cyan)),
+
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = item.name, modifier = Modifier.padding(8.dp))
         Text(text = "QTY: ${item.quantity}", modifier = Modifier.padding(8.dp))
